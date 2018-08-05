@@ -28,6 +28,42 @@ class HomePresenter(private val postRepository: PostRepository,
         }
     }
 
+    fun fetchPopularPosts(showPosts: (List<Post>) -> Unit, showError: (String) -> Unit) = launch(IO, parent = parentJob) {
+        try {
+            val request = postRepository.getPopularPosts().await()
+            withContext(UI) {
+                if (request.isSuccessful) {
+                    showPosts(request.body() ?: listOf())
+                } else {
+                    showError(request.errorBody()?.string() ?: "Network Error")
+                }
+            }
+        } catch (exception: Exception) {
+            withContext(UI) {
+                showError(exception.localizedMessage)
+            }
+
+        }
+    }
+
+    fun fetchNetworkPosts(showPosts: (List<Post>) -> Unit, showError: (String) -> Unit) = launch(IO, parent = parentJob) {
+        try {
+            val request = postRepository.getNetworkPosts().await()
+            withContext(UI) {
+                if (request.isSuccessful) {
+                    showPosts(request.body() ?: listOf())
+                } else {
+                    showError(request.errorBody()?.string() ?: "Network Error")
+                }
+            }
+        } catch (exception: Exception) {
+            withContext(UI) {
+                showError(exception.localizedMessage)
+            }
+
+        }
+    }
+
     fun destroy() {
         parentJob.cancel()
     }

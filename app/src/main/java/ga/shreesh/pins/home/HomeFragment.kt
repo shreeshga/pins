@@ -12,10 +12,13 @@ import ga.shreesh.pins.navigation.NavigationManager
 import ga.shreesh.pins.repository.PostRepository
 import ga.shreesh.pins.repository.retrofit
 import ga.shreesh.pins.repository.sharedPreferencesFile
+import kotlinx.android.synthetic.main.fragment_home.*
 
 class HomeFragment : Fragment() {
-    private lateinit var homePresenter: HomePresenter
-    private lateinit var navigationManager: NavigationManager
+    lateinit var homePresenter: HomePresenter
+        private set
+    lateinit var navigationManager: NavigationManager
+        private set
 
     companion object {
         @JvmStatic
@@ -25,9 +28,10 @@ class HomeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val sharedPreferences = context!!.getSharedPreferences(sharedPreferencesFile, Context.MODE_PRIVATE)
-        if (!sharedPreferences.contains("KEY_TOKEN")) {
-            navigationManager.navigate(NavigationManager.Screen.LOGIN)
+        context?.getSharedPreferences(sharedPreferencesFile, Context.MODE_PRIVATE)?.let {
+            if (!it.contains("KEY_TOKEN")) {
+                navigationManager.navigate(NavigationManager.Screen.LOGIN)
+            }
         }
     }
 
@@ -36,23 +40,50 @@ class HomeFragment : Fragment() {
         navigationManager = (context as HomeActivity).navigationManager
     }
 
+    override fun onAttachFragment(childFragment: Fragment?) {
+        super.onAttachFragment(childFragment)
+        (childFragment as ChildFragment).setPresenter(homePresenter)
+    }
+
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        homePresenter = HomePresenter(PostRepository(retrofit, "shreeshga:4bc5a64fe7ec86493ad8"))
+        context?.getSharedPreferences(sharedPreferencesFile, Context.MODE_PRIVATE)
+                ?.let {
+                    homePresenter =
+                            HomePresenter(PostRepository(retrofit, it.getString("KEY_TOKEN", "")))
+                }
+
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        fetch()
+
+        bottomNavigationBar.setOnNavigationItemSelectedListener {
+            addFragment(when (it.itemId) {
+                R.id.tab_all -> AllPostsFragment.create()
+                R.id.tab_popular -> PopularPostsFragment.create()
+                R.id.tab_network -> NetworkPostsFragment.create()
+                else -> throw IllegalArgumentException()
+            })
+        }
+    }
+
+    private fun addFragment(fragment: Fragment): Boolean {
+        fragmentManager?.beginTransaction()?.replace(R.id.fragmentContainer, fragment)?.commit()
+        return true
+    }
+
+    private fun fetch() {
         homePresenter.fetchAllPosts(
                 showPosts = {
                     Log.d("", "Posts loaded of size ${it.size}")
-
-                }, showError = {
-            Log.e("Error : %s", it)
-        })
+                },
+                showError = {
+                    Log.e("Error : %s", it)
+                })
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

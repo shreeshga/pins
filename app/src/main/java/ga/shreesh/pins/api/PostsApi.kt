@@ -16,6 +16,22 @@ interface PostsApi {
               @Query("meta") metatag: String = "",
               @Query("format") format: String = "json"): Deferred<Response<List<Post>>>
 
+    @GET("posts/popular")
+    fun postsPopular(@Query("auth_token", encoded = true) token: String,
+              @Query("tag") tag: String = "",
+              @Query("dt") date: String = "",
+              @Query("url") url: String = "",
+              @Query("meta") metatag: String = "",
+              @Query("format") format: String = "json"): Deferred<Response<List<Post>>>
+
+    @GET("posts/network")
+    fun postsNetwork(@Query("auth_token", encoded = true) token: String,
+              @Query("tag") tag: String = "",
+              @Query("dt") date: String = "",
+              @Query("url") url: String = "",
+              @Query("meta") metatag: String = "",
+              @Query("format") format: String = "json"): Deferred<Response<List<Post>>>
+
 
     companion object {
         fun create(retrofit: Retrofit) = retrofit.create(PostsApi::class.java)!!

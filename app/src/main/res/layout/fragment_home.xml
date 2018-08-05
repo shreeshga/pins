@@ -7,18 +7,10 @@
     android:layout_height="match_parent"
     tools:context="ga.shreesh.pins.home.HomeActivity">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/postList"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <FrameLayout
+        android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
-        tools:context="ga.shreesh.pins.home.HomeFragment"
-        tools:showIn="@layout/activity_home">
-
-    </android.support.v7.widget.RecyclerView>
+        android:layout_height="wrap_content"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -29,7 +21,7 @@
         app:srcCompat="@android:drawable/ic_input_add"/>
 
     <android.support.design.widget.BottomNavigationView
-        android:id="@+id/bottom_navigation_bar"
+        android:id="@+id/bottomNavigationBar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_gravity="bottom"

@@ -9,4 +9,8 @@ class PostRepository(private val retrofit: Retrofit, private val token: String) 
     }
 
     fun getAllPosts() = postsApi.posts(token)
+
+    fun getPopularPosts() = postsApi.postsPopular(token)
+
+    fun getNetworkPosts() = postsApi.postsNetwork((token))
 }
